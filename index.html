@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="theme-color" content="#007bff"/>
+<title>Finesse Dental Care</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  /* ===== LOCK SCREEN ===== */
+  #lock-screen { position:fixed; inset:0; background:linear-gradient(135deg,#0056b3,#007bff); z-index:99999; display:flex; align-items:center; justify-content:center; padding:24px; font-family:'Inter',sans-serif; }
+  #lock-screen .lock-card { background:white; border-radius:20px; padding:36px 28px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.25); text-align:center; }
+  #lock-screen .lock-logo { width:68px; height:68px; background:#007bff; border-radius:18px; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+  #lock-screen h1 { font-size:22px; font-weight:800; color:#1e293b; margin-bottom:6px; }
+  #lock-screen p { font-size:13px; color:#94a3b8; margin-bottom:4px; }
+  #lock-screen .lock-input { width:100%; padding:14px 16px; border:2px solid #e5e7eb; border-radius:12px; font-size:16px; text-align:center; letter-spacing:3px; margin:16px 0 12px; outline:none; transition:border 0.2s; box-sizing:border-box; }
+  #lock-screen .lock-input:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.12); }
+  #lock-screen .lock-btn { width:100%; padding:14px; background:#007bff; color:white; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; transition:background 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+  #lock-screen .lock-btn:active { background:#0056b3; }
+  #lock-screen .lock-error { color:#ef4444; font-size:13px; margin-top:10px; min-height:18px; font-weight:600; }
+  #lock-screen .lock-hint { font-size:11px; color:#cbd5e1; margin-top:16px; }
+
+  /* ===== APP ===== */
+  :root { --primary:#007bff; --primary-dark:#0056b3; --primary-light:#e8f4ff; --bottom-nav-h:64px; }
+  [dir="rtl"] { font-family:'Cairo',sans-serif; }
+  [dir="ltr"] { font-family:'Inter',sans-serif; }
+  body { background:#f0f6ff; -webkit-tap-highlight-color:transparent; overscroll-behavior:none; }
+  .card { background:white; border-radius:14px; box-shadow:0 1px 10px rgba(0,123,255,0.08); }
+  .stat-card { border-left:4px solid #007bff; }
+  [dir="rtl"] .stat-card { border-left:none; border-right:4px solid #007bff; }
+  .btn-primary { background:#007bff; color:white; transition:background 0.2s; }
+  .btn-primary:active { background:#0056b3; transform:scale(0.97); }
+  .btn-danger { background:#ef4444; color:white; }
+  .btn-danger:active { background:#dc2626; transform:scale(0.97); }
+  .badge-green { background:#d1fae5; color:#065f46; }
+  .badge-blue  { background:#dbeafe; color:#1e40af; }
+  .badge-yellow{ background:#fef3c7; color:#92400e; }
+  .badge-red   { background:#fee2e2; color:#991b1b; }
+  .nav-item.active { background:#e8f4ff; color:#007bff; border-right:3px solid #007bff; }
+  [dir="rtl"] .nav-item.active { border-right:none; border-left:3px solid #007bff; }
+  #bottom-nav { height:var(--bottom-nav-h); box-shadow:0 -2px 12px rgba(0,123,255,0.1); }
+  .bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:#94a3b8; transition:color 0.2s; padding:8px 0; cursor:pointer; border:none; background:none; }
+  .bnav-item.active { color:#007bff; }
+  .bnav-item svg { width:22px; height:22px; }
+  .bnav-item span { font-size:10px; font-weight:600; }
+  #sidebar-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:40; display:none; }
+  .tab-btn.active { background:#007bff; color:white; }
+  .tab-btn { transition:all 0.2s; cursor:pointer; }
+  .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:9999; animation:slideUp 0.3s ease; white-space:nowrap; }
+  @media(min-width:768px){ .toast { bottom:24px; left:auto; right:24px; transform:none; } [dir="rtl"] .toast { right:auto; left:24px; } }
+  @keyframes slideUp { from{opacity:0;transform:translateX(-50%) translateY(20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+  @media(min-width:768px){ @keyframes slideUp2 { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} } }
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:flex-end; justify-content:center; }
+  @media(min-width:640px){ .modal-overlay { align-items:center; } }
+  .modal-box { width:100%; max-width:480px; border-radius:20px 20px 0 0; max-height:90vh; overflow-y:auto; }
+  @media(min-width:640px){ .modal-box { border-radius:16px; margin:16px; } }
+  .spinner { border:3px solid #e5e7eb; border-top-color:#007bff; border-radius:50%; width:20px; height:20px; animation:spin 0.7s linear infinite; display:inline-block; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+  input, select, textarea { outline:none; border:1.5px solid #e5e7eb; transition:border 0.2s; font-size:16px !important; }
+  input:focus, select:focus, textarea:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
+  .table-row:hover { background:#f0f6ff; }
+  .table-row:active { background:#e8f4ff; }
+  .setup-bar { background:linear-gradient(135deg,#007bff,#0056b3); }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-thumb { background:#c7d9f5; border-radius:4px; }
+  .calendar-day { min-height:60px; border:1px solid #e5e7eb; border-radius:8px; padding:3px; }
+  .calendar-day.today { border-color:#007bff; background:#e8f4ff; }
+  .appt-chip { font-size:10px; padding:1px 4px; border-radius:3px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .main-content { padding-bottom:calc(var(--bottom-nav-h) + 16px); }
+  @media(min-width:768px){ .main-content { padding-bottom:24px; } }
+  .touch-item { min-height:56px; }
+  .app-header { background:white; box-shadow:0 1px 6px rgba(0,123,255,0.08); position:sticky; top:0; z-index:30; }
+  .fab { position:fixed; bottom:calc(var(--bottom-nav-h) + 16px); right:16px; z-index:35; width:52px; height:52px; border-radius:50%; box-shadow:0 4px 16px rgba(0,123,255,0.35); cursor:pointer; border:none; }
+  [dir="rtl"] .fab { right:auto; left:16px; }
+  @media(min-width:768px){ .fab { display:none !important; } }
+  #setup-section { transition:max-height 0.3s ease; overflow:hidden; }
+  .form-group { margin-bottom:14px; }
+  .form-group label { font-size:12px; font-weight:600; color:#6b7280; display:block; margin-bottom:6px; }
+  .form-group input, .form-group select, .form-group textarea { width:100%; padding:12px 14px; border-radius:10px; background:#f8fafc; font-size:16px !important; box-sizing:border-box; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     LOCK SCREEN
+     ============================================================ -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:white;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+    </div>
+    <h1>Finesse Dental Care</h1>
+    <p>Enter your password to continue</p>
+    <input class="lock-input" type="password" id="lock-input" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')checkPassword()"/>
+    <button class="lock-btn" onclick="checkPassword()">
+      <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+      Unlock
+    </button>
+    <div class="lock-error" id="lock-error"></div>
+    <div class="lock-hint">Finesse Dental Care — Staff Only</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN APP (hidden until password correct)
+     ============================================================ -->
+<div id="app" style="display:none;">
+
+<!-- Toast -->
+<div id="toast" class="toast hidden">
+  <div class="card px-4 py-3 flex items-center gap-3 shadow-lg">
+    <span id="toast-icon" class="text-lg">✅</span>
+    <span id="toast-msg" class="text-sm font-semibold text-gray-700"></span>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal-overlay hidden">
+  <div class="modal-box card bg-white">
+    <div class="flex justify-center pt-3 pb-1 md:hidden"><div class="w-10 h-1 bg-gray-200 rounded-full"></div></div>
+    <div class="px-5 pb-5 pt-3">
+      <h3 id="modal-title" class="text-lg font-bold text-gray-800 mb-4"></h3>
+      <div id="modal-body"></div>
+      <div class="flex gap-3 mt-5">
+        <button onclick="closeModal()" id="modal-cancel-btn" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition active:bg-gray-100"></button>
+        <button id="modal-confirm-btn" class="flex-1 py-3 rounded-xl btn-primary text-sm font-semibold"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- ============================================================ LAYOUT -->
+<div class="flex min-h-screen">
+
+  <!-- DESKTOP SIDEBAR -->
+  <aside class="hidden md:flex w-64 flex-shrink-0 flex-col bg-white border-r border-gray-100" style="box-shadow:2px 0 12px rgba(0,123,255,0.06);">
+    <div class="px-5 py-5 border-b border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </div>
+        <div>
+          <div class="font-bold text-gray-800 text-sm">Finesse</div>
+          <div class="text-xs text-blue-600 font-semibold">Dental Care</div>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <a class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer" onclick="showTab('dashboard')" id="nav-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span data-t="dashboard">Dashboard</span>
+      </a>
+      <a class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer" onclick="showTab('patients')" id="nav-patients">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span data-t="patients">Patients</span>
+      </a>
+      <a class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer" onclick="showTab('appointments')" id="nav-appointments">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span data-t="appointments">Appointments</span>
+      </a>
+      <a class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer" onclick="showTab('settings')" id="nav-settings">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span data-t="settings">Settings</span>
+      </a>
+    </nav>
+    <div class="px-4 py-4 border-t border-gray-100 space-y-2">
+      <button onclick="toggleLang()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-blue-50 text-sm font-medium text-gray-600 hover:text-blue-600 transition">
+        <span class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+          <span data-t="language">Language</span>
+        </span>
+        <span id="lang-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">EN</span>
+      </button>
+      <button onclick="toggleCurrency()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-blue-50 text-sm font-medium text-gray-600 hover:text-blue-600 transition">
+        <span class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span data-t="currency">Currency</span>
+        </span>
+        <span id="currency-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">USD</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN COLUMN -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- HEADER -->
+    <header class="app-header px-4 py-3 flex items-center gap-3">
+      <button onclick="openSidebar()" class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="flex items-center gap-2 md:hidden flex-shrink-0">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </div>
+        <span class="font-bold text-blue-700 text-sm">Finesse Dental</span>
+      </div>
+      <h1 id="page-title" class="flex-1 text-base md:text-xl font-bold text-gray-800 hidden md:block">Dashboard</h1>
+      <div id="loading-indicator" class="hidden flex-shrink-0"><span class="spinner"></span></div>
+      <button onclick="toggleSetup()" class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+      <div class="hidden md:flex items-center gap-2 flex-shrink-0">
+        <div class="text-right">
+          <div class="text-xs font-semibold text-gray-700" id="header-date"></div>
+          <div class="text-xs text-gray-400" id="header-time"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- SETUP BAR MOBILE (collapsible) -->
+    <div id="setup-section" style="max-height:0;" class="overflow-hidden">
+      <div class="setup-bar px-4 py-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-white font-semibold text-xs flex-shrink-0">⚙️ Setup</span>
+          <input id="gas-url-input" type="url" placeholder="Paste Google Web App URL..."
+            class="flex-1 min-w-0 px-3 py-2 rounded-xl text-sm bg-white/20 text-white placeholder-white/60 border border-white/30 focus:bg-white focus:text-gray-800 focus:placeholder-gray-400 transition"
+            oninput="saveGasUrl(this.value)" style="font-size:14px !important;"/>
+          <div class="flex items-center gap-2">
+            <div id="connection-status" class="text-xs font-medium px-2 py-1 rounded-full bg-white/20 text-white flex-shrink-0"></div>
+            <button onclick="testConnection()" class="px-3 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-semibold transition flex-shrink-0">Test</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETUP BAR DESKTOP -->
+    <div class="setup-bar px-4 py-3 hidden md:block">
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="text-white font-semibold text-sm flex-shrink-0">⚙️ System Setup</span>
+        <input id="gas-url-input-desktop" type="url" placeholder="Paste Google Web App URL..."
+          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl text-sm bg-white/20 text-white placeholder-white/60 border border-white/30 focus:bg-white focus:text-gray-800 focus:placeholder-gray-400 transition"
+          oninput="saveGasUrl(this.value)"/>
+        <div id="connection-status-desktop" class="text-xs font-medium px-3 py-1.5 rounded-full bg-white/20 text-white flex-shrink-0"></div>
+        <button onclick="testConnection()" class="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-semibold transition flex-shrink-0">Test Connection</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <main class="flex-1 overflow-y-auto main-content">
+      <div class="p-4 md:p-6 space-y-5">
+
+        <!-- DASHBOARD -->
+        <div id="tab-dashboard" class="tab-content space-y-4">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="card stat-card p-4">
+              <div class="text-xs text-gray-400 font-semibold uppercase leading-tight" data-t="today_appointments">Today's Appts</div>
+              <div class="text-3xl font-bold text-blue-600 mt-2" id="stat-today">0</div>
+              <div class="text-xs text-gray-400 mt-1" data-t="scheduled">Scheduled</div>
+            </div>
+            <div class="card p-4" style="border-left:4px solid #10b981;">
+              <div class="text-xs text-gray-400 font-semibold uppercase leading-tight" data-t="total_patients">Patients</div>
+              <div class="text-3xl font-bold text-emerald-600 mt-2" id="stat-patients">0</div>
+              <div class="text-xs text-gray-400 mt-1" data-t="registered">Registered</div>
+            </div>
+            <div class="card p-4" style="border-left:4px solid #f59e0b;">
+              <div class="text-xs text-gray-400 font-semibold uppercase leading-tight" data-t="total_appointments">Appointments</div>
+              <div class="text-3xl font-bold text-amber-500 mt-2" id="stat-appts">0</div>
+              <div class="text-xs text-gray-400 mt-1" data-t="all_time">All Time</div>
+            </div>
+            <div class="card p-4" style="border-left:4px solid #8b5cf6;">
+              <div class="text-xs text-gray-400 font-semibold uppercase leading-tight" data-t="active_doctors">Doctors</div>
+              <div class="text-3xl font-bold text-purple-600 mt-2" id="stat-doctors">0</div>
+              <div class="text-xs text-gray-400 mt-1" data-t="on_staff">On Staff</div>
+            </div>
+          </div>
+          <div class="card p-4">
+            <h2 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span data-t="todays_schedule">Today's Schedule</span>
+            </h2>
+            <div id="today-schedule" class="space-y-2"></div>
+          </div>
+          <div class="card p-4">
+            <h2 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span data-t="recent_patients">Recent Patients</span>
+            </h2>
+            <div id="recent-patients" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <!-- PATIENTS -->
+        <div id="tab-patients" class="tab-content hidden space-y-4">
+          <div class="card p-3 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input id="patient-search" type="search" placeholder="Search patients..." class="flex-1 bg-transparent text-sm border-none" style="font-size:16px !important;" oninput="renderPatients()"/>
+          </div>
+          <div class="card overflow-hidden">
+            <button onclick="toggleAddPatient()" class="w-full flex items-center justify-between p-4 text-left">
+              <span class="flex items-center gap-2 font-bold text-gray-800 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                <span data-t="add_patient">Add Patient</span>
+              </span>
+              <svg id="add-patient-chevron" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="add-patient-body" class="hidden px-4 pb-4">
+              <form id="patient-form" onsubmit="submitPatient(event)" class="space-y-3">
+                <div class="form-group"><label data-t="full_name">Full Name *</label><input id="p-name" type="text" required placeholder="John Smith"/></div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="form-group mb-0"><label data-t="phone">Phone *</label><input id="p-phone" type="tel" required placeholder="+1 234 567"/></div>
+                  <div class="form-group mb-0"><label data-t="email">Email</label><input id="p-email" type="email" placeholder="email@ex.com"/></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="form-group mb-0"><label data-t="assigned_doctor">Doctor</label><select id="p-doctor"><option value="">--</option></select></div>
+                  <div class="form-group mb-0"><label data-t="date_of_birth">DOB</label><input id="p-dob" type="date"/></div>
+                </div>
+                <div class="form-group"><label data-t="notes">Notes</label><textarea id="p-notes" rows="2" placeholder="Allergies, medical notes..."></textarea></div>
+                <button type="submit" class="w-full btn-primary py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  <span data-t="add_patient">Add Patient</span>
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="card p-4">
+            <h2 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+              <span data-t="patient_list">Patient List</span>
+            </h2>
+            <div id="patient-list" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <!-- APPOINTMENTS -->
+        <div id="tab-appointments" class="tab-content hidden space-y-4">
+          <div class="card p-3">
+            <div class="flex items-center gap-2">
+              <div class="flex rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
+                <button onclick="setApptView('list')" id="view-list" class="tab-btn active px-4 py-2 text-sm font-semibold border-0" data-t="list">List</button>
+                <button onclick="setApptView('calendar')" id="view-calendar" class="tab-btn px-4 py-2 text-sm font-semibold border-0 bg-white text-gray-500" data-t="calendar">Calendar</button>
+              </div>
+              <div class="relative flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 absolute left-3 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="appt-search" type="search" placeholder="Search..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-gray-50 text-sm border border-gray-100" oninput="renderAppointments()" style="font-size:16px !important;"/>
+              </div>
+            </div>
+          </div>
+          <div id="appt-list-view" class="card p-4"><div id="appointment-list" class="space-y-2"></div></div>
+          <div id="appt-calendar-view" class="card p-4 hidden">
+            <div class="flex items-center justify-between mb-4">
+              <button onclick="prevMonth()" class="p-2 hover:bg-gray-100 rounded-xl transition active:bg-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <h3 id="calendar-title" class="font-bold text-gray-800 text-sm"></h3>
+              <button onclick="nextMonth()" class="p-2 hover:bg-gray-100 rounded-xl transition active:bg-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-7 gap-0.5 mb-1">
+              <div class="text-center text-xs font-bold text-gray-400 py-1" data-t="sun">Su</div>
+              <div class="text-center text-xs font-bold text-gray-400 py-1" data-t="mon">Mo</div>
+              <div class="text-center text-xs font-bold text-gray-400 py-1" data-t="tue">Tu</div>
+              <div class="text-center text-xs font-bold text-gray-400 py-1" data-t="wed">We</div>
+              <div class="text-center text-xs font-bold text-gray-400 py-1" data-t="thu">Th</div>
+              <div class="text-center text-xs font-bold text-gray-400 py-1" data-t="fri">Fr</div>
+              <div class="text-center text-xs font-bold text-gray-400 py-1" data-t="sat">Sa</div>
+            </div>
+            <div id="calendar-grid" class="grid grid-cols-7 gap-0.5"></div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="tab-settings" class="tab-content hidden space-y-4">
+          <div class="card p-4">
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              <span data-t="clinic_info">Clinic Information</span>
+            </h2>
+            <form onsubmit="saveSettings(event)" class="space-y-3">
+              <div class="form-group"><label data-t="clinic_name">Clinic Name</label><input id="s-clinic-name" type="text" placeholder="Finesse Dental Care"/></div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="form-group mb-0"><label data-t="clinic_phone">Phone</label><input id="s-clinic-phone" type="tel" placeholder="+1 800 123"/></div>
+                <div class="form-group mb-0"><label data-t="local_currency">Currency Symbol</label><input id="s-currency" type="text" placeholder="EGP" maxlength="5"/></div>
+              </div>
+              <div class="form-group"><label data-t="clinic_address">Address</label><input id="s-clinic-address" type="text" placeholder="123 Dental Ave"/></div>
+              <div class="form-group"><label data-t="working_hours">Working Hours</label><input id="s-hours" type="text" placeholder="Sat-Thu: 9AM-9PM"/></div>
+              <button type="submit" class="w-full btn-primary py-3 rounded-xl font-semibold text-sm" data-t="save_settings">Save Settings</button>
+            </form>
+          </div>
+          <div class="card p-4">
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span data-t="manage_doctors">Manage Doctors</span>
+            </h2>
+            <div class="flex gap-2 mb-4">
+              <input id="new-doctor-name" type="text" class="flex-1 px-3 py-2.5 rounded-xl bg-gray-50 text-sm border border-gray-100" placeholder="Dr. Full Name" style="font-size:16px !important;"/>
+              <input id="new-doctor-spec" type="text" class="flex-1 px-3 py-2.5 rounded-xl bg-gray-50 text-sm border border-gray-100" placeholder="Specialization" style="font-size:16px !important;"/>
+              <button onclick="addDoctor()" class="btn-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0" data-t="add">Add</button>
+            </div>
+            <div id="doctors-list" class="space-y-2"></div>
+          </div>
+          <div class="card p-4 md:hidden">
+            <h2 class="font-bold text-gray-800 mb-3 text-sm">Language & Currency</h2>
+            <div class="space-y-2">
+              <button onclick="toggleLang()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 text-sm font-semibold text-gray-700">
+                <span data-t="language">Language</span>
+                <span id="lang-badge-mobile" class="text-xs font-bold px-2 py-1 rounded-full bg-blue-100 text-blue-700">EN</span>
+              </button>
+              <button onclick="toggleCurrency()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 text-sm font-semibold text-gray-700">
+                <span data-t="currency">Currency</span>
+                <span id="currency-badge-mobile" class="text-xs font-bold px-2 py-1 rounded-full bg-green-100 text-green-700">USD</span>
+              </button>
+            </div>
+          </div>
+          <div class="card p-4">
+            <h2 class="font-bold text-gray-800 mb-3 text-sm" data-t="status_guide">Status Color Guide</h2>
+            <div class="flex flex-wrap gap-2">
+              <span class="badge-green px-3 py-1.5 rounded-full text-sm font-semibold" data-t="confirmed">Confirmed</span>
+              <span class="badge-blue px-3 py-1.5 rounded-full text-sm font-semibold" data-t="scheduled">Scheduled</span>
+              <span class="badge-yellow px-3 py-1.5 rounded-full text-sm font-semibold" data-t="waiting">Waiting</span>
+              <span class="badge-red px-3 py-1.5 rounded-full text-sm font-semibold" data-t="cancelled">Cancelled</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav id="bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex z-30">
+      <button class="bnav-item active" onclick="showTab('dashboard')" id="bnav-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span data-t="dashboard">Home</span>
+      </button>
+      <button class="bnav-item" onclick="showTab('patients')" id="bnav-patients">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span data-t="patients">Patients</span>
+      </button>
+      <button class="bnav-item" onclick="showTab('appointments')" id="bnav-appointments">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span data-t="appointments">Appts</span>
+      </button>
+      <button class="bnav-item" onclick="showTab('settings')" id="bnav-settings">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span data-t="settings">Settings</span>
+      </button>
+    </nav>
+
+  </div>
+</div>
+
+<!-- FAB -->
+<button onclick="openApptModal()" class="fab btn-primary flex items-center justify-center" id="appt-fab" style="display:none;">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+</button>
+
+<!-- MOBILE SIDEBAR DRAWER -->
+<div id="mobile-sidebar" class="fixed inset-y-0 left-0 w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 flex flex-col" style="box-shadow:4px 0 20px rgba(0,0,0,0.15);">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      </div>
+      <div>
+        <div class="font-bold text-gray-800 text-sm">Finesse Dental</div>
+        <div class="text-xs text-blue-600 font-semibold">Management System</div>
+      </div>
+    </div>
+    <button onclick="closeSidebar()" class="p-2 hover:bg-gray-100 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="px-3 py-4 flex-1 overflow-y-auto space-y-1">
+    <button onclick="showTab('dashboard');closeSidebar();" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span data-t="dashboard">Dashboard</span>
+    </button>
+    <button onclick="showTab('patients');closeSidebar();" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span data-t="patients">Patients</span>
+    </button>
+    <button onclick="showTab('appointments');closeSidebar();" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span data-t="appointments">Appointments</span>
+    </button>
+    <button onclick="showTab('settings');closeSidebar();" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span data-t="settings">Settings</span>
+    </button>
+  </div>
+  <div class="px-4 py-4 border-t border-gray-100 space-y-2">
+    <div class="text-xs text-gray-400 font-semibold px-1 mb-1" id="sidebar-date"></div>
+    <button onclick="toggleLang();closeSidebar();" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 text-sm font-semibold text-gray-700">
+      <span data-t="language">Language</span>
+      <span id="lang-badge-sidebar" class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">EN</span>
+    </button>
+    <button onclick="toggleCurrency();closeSidebar();" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 text-sm font-semibold text-gray-700">
+      <span data-t="currency">Currency</span>
+      <span id="currency-badge-sidebar" class="text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">USD</span>
+    </button>
+  </div>
+</div>
+
+</div><!-- /#app -->
+
+<!-- ============================================================
+     JAVASCRIPT — ALL IN ONE
+     ============================================================ -->
+<script>
+// ---- PASSWORD ----
+const CORRECT_PASSWORD = 'MOSTAFA_saad44';
+
+function checkPassword() {
+  const val = document.getElementById('lock-input').value;
+  const err = document.getElementById('lock-error');
+  if (val === CORRECT_PASSWORD) {
+    sessionStorage.setItem('unlocked','1');
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    err.textContent = 'Incorrect password. Try again.';
+    document.getElementById('lock-input').value = '';
+    document.getElementById('lock-input').focus();
+    setTimeout(() => err.textContent = '', 3000);
+  }
+}
+
+// On page load: check if already unlocked
+(function() {
+  if (sessionStorage.getItem('unlocked') === '1') {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    // initApp runs after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      // DOM already ready (script at bottom of body)
+      window.setTimeout(initApp, 0);
+    }
+  } else {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => document.getElementById('lock-input').focus());
+    } else {
+      window.setTimeout(() => document.getElementById('lock-input').focus(), 0);
+    }
+  }
+})();
+
+// ---- STATE ----
+let gasUrl = localStorage.getItem('gasUrl') || '';
+let lang = localStorage.getItem('lang') || 'en';
+let currency = localStorage.getItem('currency') || 'USD';
+let localCurrencySymbol = localStorage.getItem('localCurrencySymbol') || 'EGP';
+let localCurrencyRate = parseFloat(localStorage.getItem('localCurrencyRate') || '50');
+let currentTab = 'dashboard';
+let currentApptView = 'list';
+let calendarDate = new Date();
+let setupVisible = false;
+let addPatientOpen = false;
+
+let data = {
+  patients: JSON.parse(localStorage.getItem('patients') || '[]'),
+  appointments: JSON.parse(localStorage.getItem('appointments') || '[]'),
+  doctors: JSON.parse(localStorage.getItem('doctors') || '["Dr. Ahmed Hassan","Dr. Sara Mohamed","Dr. Khaled Nour"]'),
+  settings: JSON.parse(localStorage.getItem('settings') || '{}')
+};
+
+// ---- TRANSLATIONS ----
+const T = {
+  en: {
+    system_setup:'System Setup', dashboard:'Dashboard', patients:'Patients', appointments:'Appointments', settings:'Settings',
+    language:'Language', currency:'Currency',
+    today_appointments:"Today's Appts", total_patients:'Patients', total_appointments:'Appointments', active_doctors:'Doctors',
+    scheduled:'Scheduled', registered:'Registered', all_time:'All Time', on_staff:'On Staff',
+    todays_schedule:"Today's Schedule", recent_patients:'Recent Patients',
+    add_patient:'Add Patient', patient_list:'Patient List',
+    full_name:'Full Name *', phone:'Phone *', email:'Email', assigned_doctor:'Doctor', date_of_birth:'DOB', notes:'Notes',
+    list:'List', calendar:'Calendar',
+    sun:'Su', mon:'Mo', tue:'Tu', wed:'We', thu:'Th', fri:'Fr', sat:'Sa',
+    clinic_info:'Clinic Info', manage_doctors:'Manage Doctors',
+    clinic_name:'Clinic Name', clinic_phone:'Phone', clinic_address:'Address',
+    working_hours:'Working Hours', local_currency:'Currency Symbol',
+    save_settings:'Save Settings', add:'Add', status_guide:'Status Color Guide',
+    confirmed:'Confirmed', waiting:'Waiting', cancelled:'Cancelled',
+    no_appointments:'No appointments today', no_patients:'No patients found',
+    patient_added:'Patient added!', appt_added:'Appointment saved!',
+    settings_saved:'Settings saved!', doctor_added:'Doctor added!', doctor_removed:'Doctor removed',
+    no_url:'Please paste your Google Web App URL first',
+    connected:'✅ Connected', not_connected:'❌ Not Connected',
+    appt_modal_title:'New Appointment',
+    patient_name_label:'Patient Name', doctor_label:'Doctor', date_label:'Date',
+    time_label:'Time', service_label:'Service', fee_label:'Fee', status_label:'Status',
+    notes_label:'Notes', save:'Save', cancel:'Cancel',
+    delete_confirm:'Confirm Delete', delete_msg:'Delete this record?',
+    yes_delete:'Delete', cancel_btn:'Cancel',
+    no_gas_warning:'No backend URL — saved locally only.',
+    services:['Checkup','Cleaning','Filling','Root Canal','Extraction','Whitening','Crown','Braces','Implant','Other'],
+    statuses:['Scheduled','Confirmed','Waiting','Completed','Cancelled'],
+  },
+  ar: {
+    system_setup:'إعداد النظام', dashboard:'الرئيسية', patients:'المرضى', appointments:'المواعيد', settings:'الإعدادات',
+    language:'اللغة', currency:'العملة',
+    today_appointments:'مواعيد اليوم', total_patients:'المرضى', total_appointments:'المواعيد', active_doctors:'الأطباء',
+    scheduled:'مجدول', registered:'مسجل', all_time:'الكل', on_staff:'الطاقم',
+    todays_schedule:'جدول اليوم', recent_patients:'أحدث المرضى',
+    add_patient:'إضافة مريض', patient_list:'قائمة المرضى',
+    full_name:'الاسم الكامل *', phone:'الهاتف *', email:'البريد', assigned_doctor:'الطبيب', date_of_birth:'الميلاد', notes:'ملاحظات',
+    list:'قائمة', calendar:'تقويم',
+    sun:'أحد', mon:'اثن', tue:'ثلث', wed:'أرب', thu:'خمس', fri:'جمع', sat:'سبت',
+    clinic_info:'معلومات العيادة', manage_doctors:'إدارة الأطباء',
+    clinic_name:'اسم العيادة', clinic_phone:'الهاتف', clinic_address:'العنوان',
+    working_hours:'ساعات العمل', local_currency:'رمز العملة',
+    save_settings:'حفظ الإعدادات', add:'إضافة', status_guide:'دليل الألوان',
+    confirmed:'مؤكد', waiting:'انتظار', cancelled:'ملغي',
+    no_appointments:'لا مواعيد اليوم', no_patients:'لا مرضى',
+    patient_added:'تمت إضافة المريض!', appt_added:'تم حفظ الموعد!',
+    settings_saved:'تم الحفظ!', doctor_added:'تمت الإضافة!', doctor_removed:'تم الحذف',
+    no_url:'الرجاء لصق رابط Google Web App أولاً',
+    connected:'✅ متصل', not_connected:'❌ غير متصل',
+    appt_modal_title:'موعد جديد',
+    patient_name_label:'اسم المريض', doctor_label:'الطبيب', date_label:'التاريخ',
+    time_label:'الوقت', service_label:'الخدمة', fee_label:'الرسوم', status_label:'الحالة',
+    notes_label:'ملاحظات', save:'حفظ', cancel:'إلغاء',
+    delete_confirm:'تأكيد الحذف', delete_msg:'حذف هذا السجل؟',
+    yes_delete:'حذف', cancel_btn:'إلغاء',
+    no_gas_warning:'لا يوجد رابط — البيانات محلية فقط.',
+    services:['فحص','تنظيف','حشو','علاج عصب','خلع','تبييض','تاج','تقويم','زراعة','أخرى'],
+    statuses:['مجدول','مؤكد','انتظار','مكتمل','ملغي'],
+  }
+};
+const t = k => T[lang][k] || k;
+
+// ---- INIT ----
+function initApp() {
+  if (gasUrl) {
+    const a = document.getElementById('gas-url-input');
+    const b = document.getElementById('gas-url-input-desktop');
+    if(a) a.value = gasUrl;
+    if(b) b.value = gasUrl;
+    updateConnectionStatus(true);
+  } else {
+    updateConnectionStatus(false);
+  }
+  applyLang();
+  applySettings();
+  showTab('dashboard');
+  updateClock();
+  setInterval(updateClock, 1000);
+  if (gasUrl) fetchAllData();
+  updateFab();
+  // modal close on backdrop
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+}
+
+// ---- CLOCK ----
+function updateClock() {
+  const now = new Date();
+  const loc = lang==='ar' ? 'ar-EG' : 'en-US';
+  const d = now.toLocaleDateString(loc,{weekday:'short',month:'short',day:'numeric'});
+  const ti = now.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit'});
+  const he = document.getElementById('header-date'), ht = document.getElementById('header-time'), sd = document.getElementById('sidebar-date');
+  if(he) he.textContent = d;
+  if(ht) ht.textContent = ti;
+  if(sd) sd.textContent = d+' '+ti;
+}
+
+// ---- SETUP ----
+function toggleSetup() {
+  setupVisible = !setupVisible;
+  document.getElementById('setup-section').style.maxHeight = setupVisible ? '200px' : '0';
+}
+function saveGasUrl(val) {
+  gasUrl = val.trim();
+  localStorage.setItem('gasUrl', gasUrl);
+  const a = document.getElementById('gas-url-input'), b = document.getElementById('gas-url-input-desktop');
+  if(a && a !== document.activeElement) a.value = gasUrl;
+  if(b && b !== document.activeElement) b.value = gasUrl;
+  updateConnectionStatus(gasUrl.length > 0);
+}
+function updateConnectionStatus(ok) {
+  ['connection-status','connection-status-desktop'].forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    el.textContent = ok ? '● Connected' : '● No URL';
+    el.className = ok ? 'text-xs font-semibold px-2 py-1 rounded-full bg-green-400/30 text-green-100'
+                      : 'text-xs font-semibold px-2 py-1 rounded-full bg-red-400/30 text-red-100';
+  });
+}
+async function testConnection() {
+  if (!gasUrl) { showToast(t('no_url'),'⚠️'); return; }
+  showLoading(true);
+  try {
+    const res = await fetch(`${gasUrl}?action=read&sheet=Settings`);
+    const json = await res.json();
+    if (json) { showToast(t('connected'),'✅'); updateConnectionStatus(true); }
+  } catch(e) { showToast(t('not_connected')+': '+e.message,'❌'); updateConnectionStatus(false); }
+  showLoading(false);
+}
+
+// ---- FETCH / SEND GAS ----
+async function fetchAllData() {
+  if (!gasUrl) return;
+  showLoading(true);
+  try {
+    const sheets = ['Patients','Appointments','Doctors','Settings'];
+    const results = await Promise.all(sheets.map(s => fetch(`${gasUrl}?action=read&sheet=${s}`).then(r=>r.json()).catch(()=>null)));
+    if (results[0]&&Array.isArray(results[0])) { data.patients=results[0]; localStorage.setItem('patients',JSON.stringify(data.patients)); }
+    if (results[1]&&Array.isArray(results[1])) { data.appointments=results[1]; localStorage.setItem('appointments',JSON.stringify(data.appointments)); }
+    if (results[2]&&Array.isArray(results[2])) { const d=results[2].map(r=>typeof r==='string'?r:(r.name||r.Name||'')).filter(Boolean); if(d.length){data.doctors=d;localStorage.setItem('doctors',JSON.stringify(data.doctors));} }
+    if (results[3]&&typeof results[3]==='object'&&!Array.isArray(results[3])) { data.settings=results[3]; localStorage.setItem('settings',JSON.stringify(data.settings)); }
+    renderCurrentTab();
+  } catch(e) { console.error(e); }
+  showLoading(false);
+}
+async function sendToGas(sheet, rowData) {
+  if (!gasUrl) return false;
+  try {
+    const res = await fetch(gasUrl,{method:'POST',body:JSON.stringify({action:'write',sheet,data:rowData}),headers:{'Content-Type':'text/plain'}});
+    const json = await res.json();
+    return json.success||json.status==='ok';
+  } catch(e) { console.error(e); return false; }
+}
+
+// ---- TABS ----
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.remove('hidden');
+  const n=document.getElementById(`nav-${tab}`); if(n) n.classList.add('active');
+  const b=document.getElementById(`bnav-${tab}`); if(b) b.classList.add('active');
+  const el=document.getElementById('page-title');
+  if(el) el.textContent={dashboard:t('dashboard'),patients:t('patients'),appointments:t('appointments'),settings:t('settings')}[tab]||tab;
+  updateFab(); renderCurrentTab();
+}
+function updateFab() {
+  const f=document.getElementById('appt-fab'); if(f) f.style.display=currentTab==='appointments'?'flex':'none';
+}
+function renderCurrentTab() {
+  if(currentTab==='dashboard') renderDashboard();
+  else if(currentTab==='patients'){renderPatients();populateDoctorSelects();}
+  else if(currentTab==='appointments') renderAppointments();
+  else if(currentTab==='settings') renderSettings();
+}
+
+// ---- SIDEBAR ----
+function openSidebar() { document.getElementById('mobile-sidebar').style.transform='translateX(0)'; document.getElementById('sidebar-overlay').style.display='block'; }
+function closeSidebar() { document.getElementById('mobile-sidebar').style.transform='translateX(-100%)'; document.getElementById('sidebar-overlay').style.display='none'; }
+
+// ---- DASHBOARD ----
+function renderDashboard() {
+  const today=new Date().toISOString().split('T')[0];
+  const ta=data.appointments.filter(a=>(a.date||'').startsWith(today));
+  document.getElementById('stat-today').textContent=ta.length;
+  document.getElementById('stat-patients').textContent=data.patients.length;
+  document.getElementById('stat-appts').textContent=data.appointments.length;
+  document.getElementById('stat-doctors').textContent=data.doctors.length;
+  const sched=document.getElementById('today-schedule');
+  sched.innerHTML=ta.length===0
+    ?`<div class="text-center py-8 text-gray-400"><div class="text-4xl mb-2">📅</div><div class="text-sm font-medium">${t('no_appointments')}</div></div>`
+    :ta.slice(0,8).map(a=>`<div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 touch-item">
+        <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs flex-shrink-0">${(a.time||'--').substring(0,5)}</div>
+        <div class="flex-1 min-w-0"><div class="font-semibold text-gray-800 text-sm truncate">${a.patientName||a.patient_name||'---'}</div>
+        <div class="text-xs text-gray-400 mt-0.5">${a.doctor||''} ${a.service?'· '+a.service:''}</div></div>
+        <span class="text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${statusBadge(a.status)}">${a.status||'Scheduled'}</span></div>`).join('');
+  const rp=[...data.patients].reverse().slice(0,5);
+  document.getElementById('recent-patients').innerHTML=rp.length===0
+    ?`<div class="text-center py-6 text-gray-400 text-sm">No patients yet</div>`
+    :rp.map(p=>`<div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 touch-item">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${(p.name||p.Name||'?')[0].toUpperCase()}</div>
+        <div class="flex-1 min-w-0"><div class="font-semibold text-gray-800 text-sm truncate">${p.name||p.Name||'---'}</div>
+        <div class="text-xs text-gray-400">${p.phone||p.Phone||''} ${p.doctor||p.Doctor?'· '+(p.doctor||p.Doctor):''}</div></div></div>`).join('');
+}
+
+// ---- PATIENTS ----
+function toggleAddPatient() {
+  addPatientOpen=!addPatientOpen;
+  document.getElementById('add-patient-body').classList.toggle('hidden',!addPatientOpen);
+  document.getElementById('add-patient-chevron').style.transform=addPatientOpen?'rotate(180deg)':'';
+}
+function populateDoctorSelects() {
+  ['p-doctor','appt-doctor'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    const cur=sel.value;
+    sel.innerHTML='<option value="">--</option>'+data.doctors.map(d=>`<option value="${d}" ${d===cur?'selected':''}>${d}</option>`).join('');
+  });
+}
+async function submitPatient(e) {
+  e.preventDefault();
+  const p={id:Date.now().toString(),name:document.getElementById('p-name').value.trim(),phone:document.getElementById('p-phone').value.trim(),email:document.getElementById('p-email').value.trim(),doctor:document.getElementById('p-doctor').value,dob:document.getElementById('p-dob').value,notes:document.getElementById('p-notes').value.trim(),createdAt:new Date().toISOString()};
+  data.patients.push(p); localStorage.setItem('patients',JSON.stringify(data.patients));
+  document.getElementById('patient-form').reset();
+  addPatientOpen=false; document.getElementById('add-patient-body').classList.add('hidden'); document.getElementById('add-patient-chevron').style.transform='';
+  renderPatients(); showToast(t('patient_added'),'✅');
+  if(gasUrl){showLoading(true);await sendToGas('Patients',p);showLoading(false);}else showToast(t('no_gas_warning'),'⚠️');
+}
+function renderPatients() {
+  const s=(document.getElementById('patient-search')?.value||'').toLowerCase();
+  const f=data.patients.filter(p=>(p.name||p.Name||'').toLowerCase().includes(s)||(p.phone||p.Phone||'').toLowerCase().includes(s)||(p.doctor||p.Doctor||'').toLowerCase().includes(s));
+  const c=document.getElementById('patient-list'); if(!c) return;
+  if(!f.length){c.innerHTML=`<div class="text-center py-10 text-gray-400"><div class="text-4xl mb-2">🦷</div><div class="text-sm font-medium">${t('no_patients')}</div></div>`;return;}
+  c.innerHTML=f.map((p,i)=>`<div class="flex items-start gap-3 p-3 rounded-xl border border-gray-100 table-row touch-item">
+    <div class="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base flex-shrink-0">${(p.name||p.Name||'?')[0].toUpperCase()}</div>
+    <div class="flex-1 min-w-0"><div class="font-semibold text-gray-800 text-sm">${p.name||p.Name||'---'}</div>
+    <div class="text-xs text-gray-500 mt-0.5">${p.phone||p.Phone||''}</div>
+    ${(p.doctor||p.Doctor)?`<div class="text-xs text-blue-500 mt-0.5">${p.doctor||p.Doctor}</div>`:''}
+    ${(p.notes||p.Notes)?`<div class="text-xs text-gray-400 mt-1 line-clamp-1">${p.notes||p.Notes}</div>`:''}</div>
+    <button onclick="deletePatient(${i})" class="flex-shrink-0 p-2 hover:bg-red-50 active:bg-red-100 rounded-xl text-gray-300 hover:text-red-500 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    </button></div>`).join('');
+}
+function deletePatient(idx) {
+  openConfirmModal(t('delete_confirm'),t('delete_msg'),()=>{data.patients.splice(idx,1);localStorage.setItem('patients',JSON.stringify(data.patients));renderPatients();showToast('Deleted','🗑️');});
+}
+
+// ---- APPOINTMENTS ----
+function setApptView(v) {
+  currentApptView=v;
+  document.getElementById('view-list').className=`tab-btn px-4 py-2 text-sm font-semibold border-0 ${v==='list'?'active':'bg-white text-gray-500'}`;
+  document.getElementById('view-calendar').className=`tab-btn px-4 py-2 text-sm font-semibold border-0 ${v==='calendar'?'active':'bg-white text-gray-500'}`;
+  document.getElementById('appt-list-view').classList.toggle('hidden',v!=='list');
+  document.getElementById('appt-calendar-view').classList.toggle('hidden',v!=='calendar');
+  if(v==='calendar') renderCalendar();
+}
+function renderAppointments() {
+  const s=(document.getElementById('appt-search')?.value||'').toLowerCase();
+  const f=data.appointments.filter(a=>(a.patientName||a.patient_name||'').toLowerCase().includes(s)||(a.phone||a.Phone||'').toLowerCase().includes(s)||(a.doctor||'').toLowerCase().includes(s)).sort((a,b)=>new Date(b.date+' '+b.time)-new Date(a.date+' '+a.time));
+  const c=document.getElementById('appointment-list'); if(!c) return;
+  if(!f.length){c.innerHTML=`<div class="text-center py-10 text-gray-400"><div class="text-4xl mb-2">📅</div><div class="text-sm font-medium">${t('no_appointments')}</div></div>`;return;}
+  c.innerHTML=f.map(a=>`<div class="flex items-start gap-3 p-3 rounded-xl border border-gray-100 table-row touch-item">
+    <div class="flex-shrink-0 text-center bg-blue-50 rounded-xl px-2.5 py-2 min-w-[54px]">
+      <div class="text-blue-700 font-bold text-sm">${(a.date||'').substring(5,10)}</div>
+      <div class="text-gray-500 text-xs font-medium">${(a.time||'--').substring(0,5)}</div></div>
+    <div class="flex-1 min-w-0"><div class="font-semibold text-gray-800 text-sm">${a.patientName||a.patient_name||'---'}</div>
+    <div class="text-xs text-gray-500 mt-0.5">${a.doctor||''} ${a.service?'· '+a.service:''}</div>
+    ${a.fee?`<div class="text-xs text-emerald-600 mt-0.5 font-semibold">${formatCurrency(a.fee)}</div>`:''}</div>
+    <div class="flex flex-col items-end gap-2 flex-shrink-0">
+      <span class="text-xs px-2.5 py-1 rounded-full font-semibold ${statusBadge(a.status)}">${a.status||'Scheduled'}</span>
+      <button onclick="deleteAppt(${data.appointments.indexOf(a)})" class="p-1.5 hover:bg-red-50 active:bg-red-100 rounded-lg text-gray-300 hover:text-red-500 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      </button></div></div>`).join('');
+}
+function deleteAppt(idx) {
+  openConfirmModal(t('delete_confirm'),t('delete_msg'),()=>{data.appointments.splice(idx,1);localStorage.setItem('appointments',JSON.stringify(data.appointments));renderAppointments();renderCalendar();showToast('Deleted','🗑️');});
+}
+function openApptModal() {
+  populateDoctorSelects();
+  const services=t('services'), statuses=t('statuses');
+  document.getElementById('modal-title').textContent=t('appt_modal_title');
+  document.getElementById('modal-body').innerHTML=`<div class="space-y-3">
+    <div class="form-group"><label>${t('patient_name_label')} *</label>
+      <input id="appt-patient" type="text" required list="pt-suggest" placeholder="Patient name" class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100"/>
+      <datalist id="pt-suggest">${data.patients.map(p=>`<option value="${p.name||p.Name||''}">`).join('')}</datalist></div>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="form-group mb-0"><label>${t('doctor_label')}</label>
+        <select id="appt-doctor" class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100"><option value="">--</option>${data.doctors.map(d=>`<option>${d}</option>`).join('')}</select></div>
+      <div class="form-group mb-0"><label>${t('status_label')}</label>
+        <select id="appt-status" class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100">${statuses.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="form-group mb-0"><label>${t('date_label')} *</label>
+        <input id="appt-date" type="date" required class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100" value="${new Date().toISOString().split('T')[0]}"/></div>
+      <div class="form-group mb-0"><label>${t('time_label')} *</label>
+        <input id="appt-time" type="time" required class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100" value="09:00"/></div></div>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="form-group mb-0"><label>${t('service_label')}</label>
+        <select id="appt-service" class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100"><option value="">--</option>${services.map(s=>`<option>${s}</option>`).join('')}</select></div>
+      <div class="form-group mb-0"><label>${t('fee_label')}</label>
+        <input id="appt-fee" type="number" min="0" step="any" class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100" placeholder="0.00"/></div></div>
+    <div class="form-group"><label>${t('notes_label')}</label>
+      <textarea id="appt-notes" rows="2" class="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-100 resize-none" placeholder="..."></textarea></div></div>`;
+  document.getElementById('modal-cancel-btn').textContent=t('cancel');
+  document.getElementById('modal-confirm-btn').textContent=t('save');
+  document.getElementById('modal-confirm-btn').onclick=saveAppt;
+  document.getElementById('modal').classList.remove('hidden');
+}
+async function saveAppt() {
+  const patient=document.getElementById('appt-patient')?.value?.trim();
+  const date=document.getElementById('appt-date')?.value;
+  const time=document.getElementById('appt-time')?.value;
+  if(!patient||!date||!time){showToast('Fill required fields ⚠️');return;}
+  const appt={id:Date.now().toString(),patientName:patient,doctor:document.getElementById('appt-doctor')?.value||'',date,time,service:document.getElementById('appt-service')?.value||'',fee:document.getElementById('appt-fee')?.value||'',status:document.getElementById('appt-status')?.value||'Scheduled',notes:document.getElementById('appt-notes')?.value||'',createdAt:new Date().toISOString()};
+  data.appointments.push(appt); localStorage.setItem('appointments',JSON.stringify(data.appointments));
+  closeModal(); renderAppointments(); renderCalendar(); showToast(t('appt_added'),'✅');
+  if(gasUrl){showLoading(true);await sendToGas('Appointments',appt);showLoading(false);}else showToast(t('no_gas_warning'),'⚠️');
+}
+function renderCalendar() {
+  if(currentApptView!=='calendar') return;
+  const yr=calendarDate.getFullYear(),mo=calendarDate.getMonth();
+  document.getElementById('calendar-title').textContent=calendarDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-US',{month:'long',year:'numeric'});
+  const fd=new Date(yr,mo,1).getDay(), dim=new Date(yr,mo+1,0).getDate(), td=new Date();
+  let html=''; for(let i=0;i<fd;i++) html+='<div></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const it=td.getFullYear()===yr&&td.getMonth()===mo&&td.getDate()===d;
+    const da=data.appointments.filter(a=>(a.date||'').startsWith(ds));
+    html+=`<div class="calendar-day ${it?'today':''}"><div class="text-xs font-bold ${it?'text-blue-700':'text-gray-500'}">${d}</div>${da.slice(0,2).map(a=>`<div class="appt-chip badge-blue">${(a.time||'').substring(0,5)}</div>`).join('')}${da.length>2?`<div class="text-xs text-gray-400">+${da.length-2}</div>`:''}</div>`;
+  }
+  document.getElementById('calendar-grid').innerHTML=html;
+}
+function prevMonth(){calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()-1,1);renderCalendar();}
+function nextMonth(){calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();}
+
+// ---- SETTINGS ----
+function applySettings() {
+  const s=data.settings;
+  const g=(id,v)=>{const el=document.getElementById(id);if(el&&v)el.value=v;};
+  g('s-clinic-name',s.clinicName); g('s-clinic-phone',s.clinicPhone); g('s-clinic-address',s.clinicAddress); g('s-hours',s.workingHours); g('s-currency',s.localCurrencySymbol);
+  if(s.localCurrencySymbol){localCurrencySymbol=s.localCurrencySymbol;localStorage.setItem('localCurrencySymbol',localCurrencySymbol);}
+}
+async function saveSettings(e) {
+  e.preventDefault();
+  data.settings={clinicName:document.getElementById('s-clinic-name').value,clinicPhone:document.getElementById('s-clinic-phone').value,clinicAddress:document.getElementById('s-clinic-address').value,workingHours:document.getElementById('s-hours').value,localCurrencySymbol:document.getElementById('s-currency').value||'EGP'};
+  localCurrencySymbol=data.settings.localCurrencySymbol;
+  localStorage.setItem('settings',JSON.stringify(data.settings)); localStorage.setItem('localCurrencySymbol',localCurrencySymbol);
+  showToast(t('settings_saved'),'✅');
+  if(gasUrl){showLoading(true);await sendToGas('Settings',data.settings);showLoading(false);}
+}
+function renderSettings(){applySettings();renderDoctors();}
+function renderDoctors() {
+  const c=document.getElementById('doctors-list'); if(!c) return;
+  if(!data.doctors.length){c.innerHTML=`<div class="text-center py-6 text-gray-400 text-sm">No doctors added</div>`;return;}
+  c.innerHTML=data.doctors.map((d,i)=>`<div class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 touch-item">
+    <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-sm flex-shrink-0">${d[0]||'D'}</div>
+    <div class="flex-1 text-sm font-semibold text-gray-800">${d}</div>
+    <button onclick="deleteDoctor(${i})" class="p-2 hover:bg-red-50 active:bg-red-100 rounded-xl text-gray-300 hover:text-red-500 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    </button></div>`).join('');
+}
+async function addDoctor() {
+  const name=document.getElementById('new-doctor-name').value.trim(); if(!name) return;
+  const spec=document.getElementById('new-doctor-spec').value.trim();
+  const full=spec?`${name} (${spec})`:name;
+  data.doctors.push(full); localStorage.setItem('doctors',JSON.stringify(data.doctors));
+  document.getElementById('new-doctor-name').value=''; document.getElementById('new-doctor-spec').value='';
+  renderDoctors(); populateDoctorSelects(); showToast(t('doctor_added'),'✅');
+  if(gasUrl) await sendToGas('Doctors',{name:full});
+}
+function deleteDoctor(idx) {
+  openConfirmModal(t('delete_confirm'),t('delete_msg'),()=>{data.doctors.splice(idx,1);localStorage.setItem('doctors',JSON.stringify(data.doctors));renderDoctors();populateDoctorSelects();showToast(t('doctor_removed'),'🗑️');});
+}
+
+// ---- CURRENCY ----
+function toggleCurrency() {
+  currency=currency==='USD'?'LOCAL':'USD'; localStorage.setItem('currency',currency);
+  const label=currency==='USD'?'USD':localCurrencySymbol;
+  ['currency-badge','currency-badge-mobile','currency-badge-sidebar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=label;});
+  renderCurrentTab();
+}
+function formatCurrency(amount) {
+  const n=parseFloat(amount)||0;
+  return currency==='USD'?`$${n.toFixed(2)}`:`${(n*localCurrencyRate).toFixed(0)} ${localCurrencySymbol}`;
+}
+
+// ---- LANGUAGE ----
+function toggleLang() { lang=lang==='en'?'ar':'en'; localStorage.setItem('lang',lang); applyLang(); renderCurrentTab(); }
+function applyLang() {
+  const h=document.documentElement;
+  h.setAttribute('lang',lang); h.setAttribute('dir',lang==='ar'?'rtl':'ltr');
+  const label=lang==='ar'?'AR':'EN';
+  ['lang-badge','lang-badge-mobile','lang-badge-sidebar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=label;});
+  document.querySelectorAll('[data-t]').forEach(el=>{const k=el.getAttribute('data-t');if(T[lang][k]&&typeof T[lang][k]==='string')el.textContent=T[lang][k];});
+}
+
+// ---- HELPERS ----
+function statusBadge(s) {
+  s=(s||'').toLowerCase();
+  if(s.includes('confirm')||s.includes('مؤكد')) return 'badge-green';
+  if(s.includes('complet')||s.includes('مكتمل')) return 'badge-blue';
+  if(s.includes('wait')||s.includes('انتظار')) return 'badge-yellow';
+  if(s.includes('cancel')||s.includes('ملغ')) return 'badge-red';
+  return 'badge-blue';
+}
+
+// ---- MODAL ----
+function openConfirmModal(title,message,onConfirm) {
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=`<p class="text-sm text-gray-600 leading-relaxed">${message}</p>`;
+  document.getElementById('modal-cancel-btn').textContent=t('cancel_btn');
+  document.getElementById('modal-confirm-btn').textContent=t('yes_delete');
+  document.getElementById('modal-confirm-btn').className='flex-1 py-3 rounded-xl btn-danger text-sm font-semibold';
+  document.getElementById('modal-confirm-btn').onclick=()=>{closeModal();onConfirm();};
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+  document.getElementById('modal-confirm-btn').className='flex-1 py-3 rounded-xl btn-primary text-sm font-semibold';
+}
+
+// ---- TOAST ----
+let toastTimeout;
+function showToast(msg,icon='✅') {
+  clearTimeout(toastTimeout);
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').textContent=icon;
+  const el=document.getElementById('toast'); el.classList.remove('hidden');
+  toastTimeout=setTimeout(()=>el.classList.add('hidden'),3500);
+}
+
+// ---- LOADING ----
+function showLoading(v) { document.getElementById('loading-indicator').classList.toggle('hidden',!v); }
+</script>
+</body>
+</html>
